@@ -8,20 +8,21 @@ function restricted(req, res, next) {
   }
 }
 
-/*
-  If the username in req.body already exists in the database
-
-  status 422
-  {
-    "message": "Username taken"
-  }
-*/
 async function checkUsernameFree(req, res, next) {
-  // const { username } = req.body;
-  // const users = await Users.find();
-  // if()
+  const { username } = req.body;
+  const users = await Users.find();
+  const userNames = []
+  users.forEach(user => {
+    userNames.push(user.username)
+  });
 
-  return console.log("ok")
+  if (userNames.includes(username)) {
+    res.status(422).json({
+      message: "Username taken"
+    })
+  } else {
+    next()
+  }
 }
 
 /*
@@ -32,8 +33,21 @@ async function checkUsernameFree(req, res, next) {
     "message": "Invalid credentials"
   }
 */
-function checkUsernameExists(req,res,next) {
-  next()
+async function checkUsernameExists(req, res, next) {
+  const { username } = req.body;
+  const users = await Users.find();
+  const userNames = []
+  users.forEach(user => {
+    userNames.push(user.username)
+  });
+
+  if (!userNames.includes(username)) {
+    res.status(401).json({
+      message: "Invalid credentials"
+    })
+  } else {
+    next()
+  }
 }
 
 /*
